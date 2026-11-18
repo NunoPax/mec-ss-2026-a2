@@ -1,49 +1,59 @@
-# MEC-SS Assignment 2
+# MEC SS - Assignment 2
 
-This repository contains the implementation for Assignment 2 of the Secure
-Software course. The assignment brief remains the source of truth for the
-required functionality, vulnerabilities, assessment tools, exploits, and
-report.
+The code and resources available in this repository are to be used in the scope of the _SS_ course.
 
-## Stack
+**Important:** these sources are merely suggestions of implementations.
+You should modify everything you deem as necessary and be responsible for all the content that is delivered.
 
-- `frontend/` — React application built with Vite;
-- `backend/` — Node.js and Express JSON API;
-- `postgresql/` — PostgreSQL image and assignment schema;
-- `compose.yaml` — development environment for all three services.
+The main purpose of this repository is to provide help with the initial setup of the applications that must be developed for the assignment. In particular, all the projects available are totally automated to be easily deployed in third-party setups with the help of a tool (in this case docker or maven, depending on the project).
 
-## Run the development environment
+_The contents of this repository do not replace the proper reading of the assignment description._
 
-Requirements:
+## Overview of the Contents
 
-- Docker Desktop with Docker Compose;
-- Git.
+In this repository you will find the supporting resources for Assignment 2 of MEC-SS 2026/2027.
 
-From the repository root:
+- [**`PostgreSQL`**](postgresql) - Database ready to run in a docker container with or without the help of the docker-compose tool;
+- [**`Python`**](python) - Source code of web application template in python with Docker container configured. Ready to run in docker-compose with PostgreSQL
+  - [`app/`](python/app) folder is mounted to allow developing with container running
+- [**`Java`**](java) - Source code of web application template in java/spark with Docker container configured. Ready to run in docker-compose with PostgreSQL or in your favorite IDE.
+- [**`NodeJS`**](nodejs) - Source code of web application template in nodejs with Docker container configured. Ready to run in docker-compose with PostgreSQL
+  - [`src/`](nodejs/src) folder is mounted for developing with container running
+- [**`php`**](php) - Source code of web application template in php with Docker container configured. Ready to run in docker-compose with PostgreSQL
+  - [`htdocs/`](php/htdocs) folder is mounted for developing with container running
+- [**`interfaces`**](interfaces) - the html interfaces mentioned in the assignment description. Necessary html interfaces in case other language/framework is adopted.
+- [**`docker-compose`**](.) - Files that start the demo Python, Java, NodeJS and php applications together with a PostgreSQL database;
 
-```sh
-docker compose up --build
-```
+## Requirements
 
-Open the frontend at <http://localhost:5173>. The API is available at
-<http://localhost:3000/api>, and its database-aware health check is available
-at <http://localhost:3000/api/health>.
+To execute this project it is required to have installed:
 
-To stop the services, press `Ctrl+C`. To remove the containers and the
-development database volume:
+- `docker`
+- `docker-compose`
+- `maven` only if you opt for the [java](java) option
 
-```sh
-docker compose down -v
-```
+## Development
 
-The `-v` option resets the database and should only be used when that is
-intended.
+You should select one of the options or add your own.
+Then you just need to develop inside the folder and run the script (e.g. [`./docker-compose-php-psql.sh`](docker-compose-php-psql.sh)) to have both the server and the database running.
 
-## Development model
+[`Python`](python), [`php`](php) and [`NodeJS`](nodejs) allow you to be developing while the containers are running, and the sources are continuously being integrated.
 
-The frontend and backend source directories are mounted into their containers,
-so Vite and nodemon reload source changes during development. The PostgreSQL
-schema is initialized when its data volume is created for the first time.
+In the case of [`Java`](java) we suggest that you have the container of the database running and you develop from your favourite IDE. 
+Only for delivery you need the code to be working inside the `docker` image.
+All IDEs support `maven`, and if your program works with `maven` it should be OK. Ask for the help of the professors if you face difficulties. 
 
-The backend waits for PostgreSQL's health check before starting. The frontend
-proxies `/api` requests to the backend service inside the Compose network.
+
+**Delete everything you are not planing to you in your assignment.**
+
+In `Linux` deployments you must confirm that you have `docker` installed and running, use the command `ps ax | grep dockerd` to check if `dockerd` is running, which is the process that manages containers.
+You should run your commands as superuser, and therefore you should prefix your `docker`/`docker-compose` commands with `sudo` (e.g. `sudo ./docker-compose-php-psql.sh`).
+
+## Web browser access
+
+After the required commands and having started the web application, they will available on your browser at:
+
+- NodeJs version: http://localhost:8080;
+- Python version: http://localhost:8080;
+- PHP version: http://localhost:8080;
+- Java version: http://localhost:8080;

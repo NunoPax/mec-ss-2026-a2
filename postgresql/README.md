@@ -1,24 +1,48 @@
-# PostgreSQL service
+# MSI DDSS - Postgresql Database
 
-PostgreSQL is started as part of the root Compose environment. Its schema is
-loaded from `ddss-db-schema-pg.sql` when the database volume is initialized.
+This code is to be used in the scope of the _DDSS_ course.
 
-From the repository root, start the complete stack with:
+**Important:** these sources are merely suggestions of implementations.
+You should modify everything you deem as necessary and be responsible for all the content that is delivered.
+
+_The contents of this repository do not replace the proper reading of the assignment description._
+
+## Requirements
+
+- To execute this project it is required to have installed:
+  - Docker
+
+## Development
+
+Use, only if you need to have database running in separate. The executables in the root are preparared to start the database and connect it with Web Application.
+
+It could be useful to have it running in separate for the Java example, where it is not possible for you to change code being executed by Docker and access does changes without starting docker components again.
+
+## Database Connection
+
+- **User**: ddss-database-assignment-2
+- **Password**: ddss-database-assignment-2
+- **Database name**: ddss-database-assignment-2
+- **Host**: localhost:5432
+
+## Setup and Run
+
+To build the docker image you should run:
 
 ```sh
-docker compose up --build
+sh build.sh
 ```
 
-The local development defaults are:
-
-- User: `ddss-database-assignment-2`
-- Password: `ddss-database-assignment-2`
-- Database: `ddss-database-assignment-2`
-- Host: `localhost:5432`
-
-To re-run the schema from scratch, stop the stack and remove its volume:
+To run the container:
 
 ```sh
-docker compose down -v
-docker compose up --build
+sh run.sh
+```
+
+- _note: modifying the `run.sh` script to include -dit will make the container work in background. But dont forget to use `stop.sh` to stop/remove it later._
+
+To stop the container:
+
+```sh
+sh stop.sh
 ```
