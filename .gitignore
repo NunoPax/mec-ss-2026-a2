@@ -1,0 +1,12 @@
+node_modules/
+npm-debug.log*
+*.log
+.env
+.env.*
+!.env.example
+.DS_Store
+
+# Never commit locally-generated SSH key files.
+y
+y.pub
+
