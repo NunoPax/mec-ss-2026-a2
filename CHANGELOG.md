@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.5.0] - 2026-11-19
+
+### Added
+
+- Added Redux Toolkit for centralized frontend authentication state and transitions.
+
 ## [0.4.0 ] - 2026-11-19
 
 ### Added

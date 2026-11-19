@@ -10,39 +10,22 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api";
+import { useDispatch, useSelector } from "react-redux";
+import { login as loginUser, logout } from "./store/authSlice";
 
 function LoginPage() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { error, status } = useSelector((state) => state.auth);
 
   async function handleSubmit(event) {
     event.preventDefault();
-    setError("");
-    setIsSubmitting(true);
+    const result = await dispatch(loginUser({ username, password }));
 
-    try {
-      const response = await fetch(`${API_BASE_URL}/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-      });
-      const body = await response.json();
-
-      if (!response.ok) {
-        throw new Error(body.error?.message || "Unable to sign in");
-      }
-
-      sessionStorage.setItem("username", body.username);
+    if (loginUser.fulfilled.match(result)) {
       navigate("/home", { replace: true });
-    } catch (requestError) {
-      setError(requestError.message);
-    } finally {
-      setIsSubmitting(false);
     }
   }
 
@@ -74,8 +57,8 @@ function LoginPage() {
             required
             fullWidth
           />
-          <Button type="submit" variant="contained" disabled={isSubmitting} size="large">
-            {isSubmitting ? <CircularProgress size={24} color="inherit" /> : "Sign in"}
+          <Button type="submit" variant="contained" disabled={status === "loading"} size="large">
+            {status === "loading" ? <CircularProgress size={24} color="inherit" /> : "Sign in"}
           </Button>
         </Box>
       </Paper>
@@ -85,21 +68,22 @@ function LoginPage() {
 
 function HomePage() {
   const navigate = useNavigate();
-  const username = sessionStorage.getItem("username");
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.auth.user);
 
-  if (!username) {
+  if (!user) {
     return <Navigate to="/login" replace />;
   }
 
   function handleLogout() {
-    sessionStorage.removeItem("username");
+    dispatch(logout());
     navigate("/login", { replace: true });
   }
 
   return (
     <Container maxWidth="md" sx={{ minHeight: "100vh", py: 6 }}>
       <Typography component="h1" variant="h4" gutterBottom>
-        Welcome, {username}
+        Welcome, {user.username}
       </Typography>
       <Button onClick={handleLogout} variant="outlined">
         Sign out
