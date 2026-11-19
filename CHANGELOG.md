@@ -1,19 +1,25 @@
 # Changelog
 
-## [Unreleased]
+## [0.4.0 ] - 2026-11-19
+
+### Added
+
+- Added a login endpoint and seed script.
+- Added a minimal Material UI login page with React Router navigation to `/home` after login.
+
+## [0.4.0 ] - 2026-11-18
 
 ### Added
 
 - Separated the Node.js backend into application, configuration, database, error-handling, and validation modules.
 (Not used to have all in a single repo anymore)
-- Added centralized config for backend and removed database credential fallbacks from application code.
 
 ### Evidence retain
 
 - PostgreSQL contains the tables `books`, `messages`, and `users`.
 - The `users` table contains `username`, `password`, and `salt` columns.
 - `username` is the primary key of `users`.
-- The `users` table currently contains zero rows.
+- The supplied screenshot records the `users` table before seeding, with zero rows.
 
 ## [0.3.0] - 2026-11-18
 
