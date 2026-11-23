@@ -4,6 +4,7 @@
 
 ### Added
 
+- MUI library
 - Added Redux Toolkit for centralized frontend authentication state and transitions.
 
 ## [0.4.0 ] - 2026-11-19
@@ -12,6 +13,7 @@
 
 - Added a login endpoint and seed script.
 - Added a minimal Material UI login page with React Router navigation to `/home` after login.
+- Added a PostgreSQL HTTP only session with session restoration and logout handling.
 
 ## [0.4.0 ] - 2026-11-18
 

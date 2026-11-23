@@ -3,6 +3,7 @@ const express = require("express");
 const morgan = require("morgan");
 const { AppError, errorHandler, notFoundHandler } = require("./errors");
 const { verifyPassword } = require("./passwords");
+const { createSessionMiddleware, sessionCookieName } = require("./session");
 const { validateBody } = require("./validation");
 
 const loginSchema = {
@@ -10,12 +11,30 @@ const loginSchema = {
   password: { required: true, type: "string", maxLength: 512 },
 };
 
-function createApp({ db, frontendOrigin = "http://localhost:5173" }) {
+function regenerateSession(request) {
+  return new Promise((resolve, reject) => {
+    request.session.regenerate((error) => (error ? reject(error) : resolve()));
+  });
+}
+
+function saveSession(request) {
+  return new Promise((resolve, reject) => {
+    request.session.save((error) => (error ? reject(error) : resolve()));
+  });
+}
+
+function createApp({
+  db,
+  frontendOrigin = "http://localhost:5173",
+  sessionSecret,
+  nodeEnv = "development",
+}) {
   const app = express();
 
-  app.use(cors({ origin: frontendOrigin }));
+  app.use(cors({ origin: frontendOrigin, credentials: true }));
   app.use(express.json({ limit: "16kb" }));
   app.use(morgan("dev"));
+  app.use(createSessionMiddleware({ pool: db, secret: sessionSecret, nodeEnv }));
 
   app.get("/api", (_req, res) => {
     res.json({ service: "mec-ss-node-backend", status: "ok" });
@@ -46,12 +65,36 @@ function createApp({ db, frontendOrigin = "http://localhost:5173" }) {
           return;
         }
 
+        await regenerateSession(req);
+        req.session.user = { username: user.username };
+        await saveSession(req);
         res.json({ username: user.username });
       } catch (error) {
         next(error);
       }
     }
   );
+
+  app.get("/api/auth/me", (req, res, next) => {
+    if (!req.session.user) {
+      next(new AppError(401, "Authentication required"));
+      return;
+    }
+
+    res.json(req.session.user);
+  });
+
+  app.post("/api/auth/logout", (req, res, next) => {
+    req.session.destroy((error) => {
+      if (error) {
+        next(error);
+        return;
+      }
+
+      res.clearCookie(sessionCookieName);
+      res.status(204).end();
+    });
+  });
 
   app.use(notFoundHandler);
   app.use(errorHandler);

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import {
   Alert,
@@ -6,12 +6,11 @@ import {
   Button,
   CircularProgress,
   Container,
-  Paper,
   TextField,
   Typography,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { login as loginUser, logout } from "./store/authSlice";
+import { login as loginUser, logoutSession, restoreSession } from "./store/authSlice";
 
 function LoginPage() {
   const navigate = useNavigate();
@@ -30,38 +29,33 @@ function LoginPage() {
   }
 
   return (
-    <Container maxWidth="sm" sx={{ minHeight: "100vh", display: "grid", placeItems: "center" }}>
-      <Paper component="form" onSubmit={handleSubmit} elevation={3} sx={{ width: "100%", p: 4 }}>
+    <Container maxWidth="xs">
+      <Box component="form" onSubmit={handleSubmit} sx={{ mt: 8, display: "grid", gap: 2 }}>
         <Typography component="h1" variant="h4" gutterBottom>
           Sign in
         </Typography>
-        <Typography color="text.secondary" sx={{ mb: 3 }}>
-          MEC-SS Assignment 2
-        </Typography>
-        <Box sx={{ display: "grid", gap: 2 }}>
-          {error && <Alert severity="error">{error}</Alert>}
-          <TextField
-            label="Username"
-            value={username}
-            onChange={(event) => setUsername(event.target.value)}
-            autoComplete="username"
-            required
-            fullWidth
-          />
-          <TextField
-            label="Password"
-            type="password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            autoComplete="current-password"
-            required
-            fullWidth
-          />
-          <Button type="submit" variant="contained" disabled={status === "loading"} size="large">
-            {status === "loading" ? <CircularProgress size={24} color="inherit" /> : "Sign in"}
-          </Button>
-        </Box>
-      </Paper>
+        {error && <Alert severity="error">{error}</Alert>}
+        <TextField
+          label="Username"
+          value={username}
+          onChange={(event) => setUsername(event.target.value)}
+          autoComplete="username"
+          required
+          fullWidth
+        />
+        <TextField
+          label="Password"
+          type="password"
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+          autoComplete="current-password"
+          required
+          fullWidth
+        />
+        <Button type="submit" variant="contained" disabled={status === "loading"}>
+          {status === "loading" ? <CircularProgress size={24} color="inherit" /> : "Sign in"}
+        </Button>
+      </Box>
     </Container>
   );
 }
@@ -69,14 +63,18 @@ function LoginPage() {
 function HomePage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.auth.user);
+  const { user, status } = useSelector((state) => state.auth);
+
+  if (status === "loading") {
+    return <CircularProgress sx={{ m: 4 }} />;
+  }
 
   if (!user) {
     return <Navigate to="/login" replace />;
   }
 
   function handleLogout() {
-    dispatch(logout());
+    dispatch(logoutSession());
     navigate("/login", { replace: true });
   }
 
@@ -93,6 +91,12 @@ function HomePage() {
 }
 
 function App() {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(restoreSession());
+  }, [dispatch]);
+
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/login" replace />} />
