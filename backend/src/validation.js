@@ -22,6 +22,11 @@ function validateBody(schema) {
         continue;
       }
 
+      if (rules.trim && typeof value === "string" && value.trim() === "") {
+        fields[field] = "must not be blank";
+        continue;
+      }
+
       if (rules.maxLength && typeof value === "string" && value.length > rules.maxLength) {
         fields[field] = `must be at most ${rules.maxLength} characters`;
       }

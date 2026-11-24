@@ -23,6 +23,7 @@ function getConfig(environment = process.env) {
     nodeEnv: environment.NODE_ENV || "development",
     port: parsePort(environment.PORT || "3000"),
     frontendOrigin: environment.FRONTEND_ORIGIN || "http://localhost:5173",
+    sessionSecret: requiredEnv(environment, "SESSION_SECRET"),
     db: {
       host: requiredEnv(environment, "DB_HOST"),
       port: parsePort(environment.DB_PORT || "5432", "DB_PORT"),

@@ -1,13 +1,32 @@
 # Changelog
 
-## [0.4.0 ] - 2026-11-19
+## [0.6.0] - 24-11-2026
+
+- Added book search filters.
+- Added autocomplete options for the book filters.
+- Added breadcrumbs.
+
+## [0.6.0] - 23-11-2026
+
+- Added message frontend and backend support.
+
+## [0.5.0] - 22-11-2026
+
+### Added
+
+- MUI library
+- Added Redux Toolkit for centralized frontend authentication state and transitions.
+- Added protected message listing and submission using the authenticated session.
+
+## [0.4.0 ] - 19-11-2026
 
 ### Added
 
 - Added a login endpoint and seed script.
 - Added a minimal Material UI login page with React Router navigation to `/home` after login.
+- Added a PostgreSQL HTTP only session with session restoration and logout handling.
 
-## [0.4.0 ] - 2026-11-18
+## [0.4.0 ] - 18-11-2026
 
 ### Added
 
@@ -21,7 +40,7 @@
 - `username` is the primary key of `users`.
 - The supplied screenshot records the `users` table before seeding, with zero rows.
 
-## [0.3.0] - 2026-11-18
+## [0.3.0] - 18-11-2026
 
 ### Added
 
@@ -29,7 +48,7 @@
 - Added the Node.js and Express backend.
 - Added Docker Compose orchestration for PostgreSQL, backend, and frontend.
 
-## [0.2.0] - 2026-11-18
+## [0.2.0] - 18-11-2026
 
 ### Removed
 

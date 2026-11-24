@@ -13,7 +13,6 @@
 --          João Antunes <jcfa@dei.uc.pt>
 --          Marco Vieira <mvieira@dei.uc.pt>
 -- 
--- 
 
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS messages;

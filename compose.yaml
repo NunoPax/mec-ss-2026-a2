@@ -32,6 +32,7 @@ services:
       DB_PASSWORD: ${POSTGRES_PASSWORD:-ddss-database-assignment-2}
       DB_NAME: ${POSTGRES_DB:-ddss-database-assignment-2}
       FRONTEND_ORIGIN: http://localhost:5173
+      SESSION_SECRET: ${SESSION_SECRET:-development-only-change-me}
     volumes:
       - ./backend/src:/usr/src/app/src
       - backend_node_modules:/usr/src/app/node_modules

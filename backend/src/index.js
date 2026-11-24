@@ -3,7 +3,12 @@ const { getConfig } = require("./config");
 const { pool } = require("./db");
 
 const config = getConfig();
-const app = createApp({ db: pool, frontendOrigin: config.frontendOrigin });
+const app = createApp({
+  db: pool,
+  frontendOrigin: config.frontendOrigin,
+  sessionSecret: config.sessionSecret,
+  nodeEnv: config.nodeEnv,
+});
 const server = app.listen(config.port, () => {
   console.log(`Backend listening on port ${config.port}`);
 });
