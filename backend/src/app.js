@@ -1,6 +1,7 @@
 const cors = require("cors");
 const express = require("express");
 const morgan = require("morgan");
+const { requireAuth } = require("./auth");
 const { AppError, errorHandler, notFoundHandler } = require("./errors");
 const { verifyPassword } = require("./passwords");
 const { createSessionMiddleware, sessionCookieName } = require("./session");
@@ -9,6 +10,10 @@ const { validateBody } = require("./validation");
 const loginSchema = {
   username: { required: true, type: "string", maxLength: 32 },
   password: { required: true, type: "string", maxLength: 512 },
+};
+
+const messageSchema = {
+  message: { required: true, type: "string", maxLength: 256, trim: true },
 };
 
 function regenerateSession(request) {
@@ -75,12 +80,7 @@ function createApp({
     }
   );
 
-  app.get("/api/auth/me", (req, res, next) => {
-    if (!req.session.user) {
-      next(new AppError(401, "Authentication required"));
-      return;
-    }
-
+  app.get("/api/auth/me", requireAuth, (req, res) => {
     res.json(req.session.user);
   });
 
@@ -95,6 +95,36 @@ function createApp({
       res.status(204).end();
     });
   });
+
+  app.get("/api/messages", requireAuth, async (_req, res, next) => {
+    try {
+      const result = await db.query(
+        "SELECT message_id, author, message FROM messages ORDER BY message_id DESC"
+      );
+      res.json({ messages: result.rows });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.post(
+    "/api/messages",
+    requireAuth,
+    validateBody(messageSchema),
+    async (req, res, next) => {
+      try {
+        const result = await db.query(
+          `INSERT INTO messages (author, message)
+           VALUES ($1, $2)
+           RETURNING message_id, author, message`,
+          [req.session.user.username, req.body.message.trim()]
+        );
+        res.status(201).json(result.rows[0]);
+      } catch (error) {
+        next(error);
+      }
+    }
+  );
 
   app.use(notFoundHandler);
   app.use(errorHandler);
