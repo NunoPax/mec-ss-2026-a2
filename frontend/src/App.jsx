@@ -229,7 +229,7 @@ function BooksPage() {
   useEffect(() => {
     if (user) {
       dispatch(fetchBookOptions());
-      dispatch(searchBooks(filters));
+      dispatch(searchBooks({}));
     }
   }, [dispatch, user]);
 

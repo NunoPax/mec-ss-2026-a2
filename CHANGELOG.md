@@ -5,6 +5,7 @@
 - Added book search filters.
 - Added autocomplete options for the book filters.
 - Added breadcrumbs.
+- Added GitHub Actions workflows for frontend and backend linting.
 
 ## [0.6.0] - 23-11-2026
 

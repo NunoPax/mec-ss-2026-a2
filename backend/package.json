@@ -9,7 +9,8 @@
     "dev": "nodemon src/index.js",
     "seed:books": "node scripts/seed-books.js",
     "seed": "node scripts/seed-users.js",
-    "test": "node --test"
+    "test": "node --test",
+    "lint": "eslint ."
   },
   "dependencies": {
     "connect-pg-simple": "^10.0.0",
@@ -20,6 +21,9 @@
     "pg": "^8.16.3"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.15.0",
+    "globals": "^17.14.0",
     "nodemon": "^3.1.10"
   }
 }
