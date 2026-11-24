@@ -1,20 +1,34 @@
 import { useEffect, useState } from "react";
-import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
+import {
+  Link as RouterLink,
+  Navigate,
+  Outlet,
+  Route,
+  Routes,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import {
   Alert,
+  AppBar,
+  Autocomplete,
   Box,
   Button,
+  Breadcrumbs,
   CircularProgress,
   Container,
   Divider,
+  Link,
   List,
   ListItem,
   ListItemText,
   TextField,
+  Toolbar,
   Typography,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { login as loginUser, logoutSession, restoreSession } from "./store/authSlice";
+import { fetchBookOptions, searchBooks } from "./store/booksSlice";
 import { createMessage, fetchMessages } from "./store/messagesSlice";
 
 function LoginPage() {
@@ -65,9 +79,45 @@ function LoginPage() {
   );
 }
 
-function HomePage() {
-  const navigate = useNavigate();
+function AppHeader() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const currentPage = {
+    "/messages": "Messages",
+    "/books": "Books",
+  }[location.pathname];
+
+  async function handleLogout() {
+    await dispatch(logoutSession());
+    navigate("/login", { replace: true });
+  }
+
+  return (
+    <>
+      <AppBar position="static" elevation={0} sx={{ backgroundColor: "#0b1f3a", color: "#ffffff" }}>
+        <Toolbar>
+          <Typography component="div" sx={{ flexGrow: 1, fontWeight: 600 }}>
+            Magnifique App
+          </Typography>
+          <Button color="inherit" onClick={handleLogout}>
+            Logout
+          </Button>
+        </Toolbar>
+      </AppBar>
+      <Box sx={{ px: 2, py: 2 }}>
+        <Breadcrumbs aria-label="breadcrumb">
+          <Link component={RouterLink} underline="hover" color="inherit" to="/home">
+            Home
+          </Link>
+          {currentPage && <Typography color="text.primary">{currentPage}</Typography>}
+        </Breadcrumbs>
+      </Box>
+    </>
+  );
+}
+
+function ProtectedLayout() {
   const { user, status } = useSelector((state) => state.auth);
 
   if (status === "loading") {
@@ -78,10 +128,17 @@ function HomePage() {
     return <Navigate to="/login" replace />;
   }
 
-  function handleLogout() {
-    dispatch(logoutSession());
-    navigate("/login", { replace: true });
-  }
+  return (
+    <>
+      <AppHeader />
+      <Outlet />
+    </>
+  );
+}
+
+function HomePage() {
+  const navigate = useNavigate();
+  const { user } = useSelector((state) => state.auth);
 
   return (
     <Container maxWidth="md" sx={{ minHeight: "100vh", py: 6 }}>
@@ -91,8 +148,8 @@ function HomePage() {
       <Button onClick={() => navigate("/messages")} variant="contained" sx={{ mr: 2 }}>
         Messages
       </Button>
-      <Button onClick={handleLogout} variant="outlined">
-        Sign out
+      <Button onClick={() => navigate("/books")} variant="contained" sx={{ mr: 2 }}>
+        Books
       </Button>
     </Container>
   );
@@ -100,7 +157,7 @@ function HomePage() {
 
 function MessagesPage() {
   const dispatch = useDispatch();
-  const { user, status: authStatus } = useSelector((state) => state.auth);
+  const { user } = useSelector((state) => state.auth);
   const { items, status, submitStatus, error } = useSelector((state) => state.messages);
   const [message, setMessage] = useState("");
 
@@ -109,14 +166,6 @@ function MessagesPage() {
       dispatch(fetchMessages());
     }
   }, [dispatch, user]);
-
-  if (authStatus === "loading") {
-    return <CircularProgress sx={{ m: 4 }} />;
-  }
-
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -166,6 +215,92 @@ function MessagesPage() {
   );
 }
 
+function BooksPage() {
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
+  const { items, total, options, status, error } = useSelector((state) => state.books);
+  const [filters, setFilters] = useState({
+    title: "",
+    authors: "",
+    category: "",
+    keywords: "",
+  });
+
+  useEffect(() => {
+    if (user) {
+      dispatch(fetchBookOptions());
+      dispatch(searchBooks(filters));
+    }
+  }, [dispatch, user]);
+
+  function handleSubmit(event) {
+    event.preventDefault();
+    dispatch(searchBooks(filters));
+  }
+
+  return (
+    <Container maxWidth="md" sx={{ py: 6 }}>
+      <Typography component="h1" variant="h4" gutterBottom>
+        Book search
+      </Typography>
+      <Box component="form" onSubmit={handleSubmit} sx={{ display: "grid", gap: 2, mb: 4 }}>
+        {error && <Alert severity="error">{error}</Alert>}
+        <Autocomplete
+          freeSolo
+          options={options.titles}
+          inputValue={filters.title}
+          onInputChange={(_event, value) => setFilters((current) => ({ ...current, title: value }))}
+          renderInput={(params) => <TextField {...params} label="Title" />}
+        />
+        <Autocomplete
+          freeSolo
+          options={options.authors}
+          inputValue={filters.authors}
+          onInputChange={(_event, value) => setFilters((current) => ({ ...current, authors: value }))}
+          renderInput={(params) => <TextField {...params} label="Author" />}
+        />
+        <Autocomplete
+          freeSolo
+          options={options.categories}
+          inputValue={filters.category}
+          onInputChange={(_event, value) => setFilters((current) => ({ ...current, category: value }))}
+          renderInput={(params) => <TextField {...params} label="Category" />}
+        />
+        <Autocomplete
+          freeSolo
+          options={options.keywords}
+          inputValue={filters.keywords}
+          onInputChange={(_event, value) => setFilters((current) => ({ ...current, keywords: value }))}
+          renderInput={(params) => <TextField {...params} label="Keywords" />}
+        />
+        <Button type="submit" variant="contained" disabled={status === "loading"}>
+          {status === "loading" ? <CircularProgress size={24} color="inherit" /> : "Search"}
+        </Button>
+      </Box>
+      <Typography color="text.secondary" sx={{ mb: 2 }}>
+        {total} result{total === 1 ? "" : "s"}
+      </Typography>
+      {status === "loading" ? (
+        <CircularProgress />
+      ) : (
+        <List>
+          {items.map((book) => (
+            <Box key={book.book_id}>
+              <ListItem alignItems="flex-start">
+                <ListItemText
+                  primary={book.title}
+                  secondary={`${book.authors} · ${book.category} · €${book.price}`}
+                />
+              </ListItem>
+              <Divider />
+            </Box>
+          ))}
+        </List>
+      )}
+    </Container>
+  );
+}
+
 function App() {
   const dispatch = useDispatch();
 
@@ -177,8 +312,11 @@ function App() {
     <Routes>
       <Route path="/" element={<Navigate to="/login" replace />} />
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/home" element={<HomePage />} />
-      <Route path="/messages" element={<MessagesPage />} />
+      <Route element={<ProtectedLayout />}>
+        <Route path="/home" element={<HomePage />} />
+        <Route path="/messages" element={<MessagesPage />} />
+        <Route path="/books" element={<BooksPage />} />
+      </Route>
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   );

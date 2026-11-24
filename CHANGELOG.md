@@ -1,8 +1,14 @@
 # Changelog
 
+## [0.6.0] - 24-11-2026
+
+- Added book search filters.
+- Added autocomplete options for the book filters.
+- Added breadcrumbs.
+
 ## [0.6.0] - 23-11-2026
 
-- Added message frontend and backend support 
+- Added message frontend and backend support.
 
 ## [0.5.0] - 22-11-2026
 

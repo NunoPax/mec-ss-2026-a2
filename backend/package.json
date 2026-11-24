@@ -7,6 +7,7 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
+    "seed:books": "node scripts/seed-books.js",
     "seed": "node scripts/seed-users.js",
     "test": "node --test"
   },
